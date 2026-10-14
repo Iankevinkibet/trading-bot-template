@@ -1,20 +1,22 @@
-@use 'components/shared/styles/mixins' as *;
-
+/* layout overrides and spacing to integrate new header/footer */
 .layout {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    .deriv-header {
-        background: var(--general-main-1);
-        height: 5.6rem;
-    }
+.layout > .container {
+  flex: 1;
+}
 
-    &.quick-strategy-active {
-        .deriv-header {
-            @include mobile-or-tablet-screen {
-                z-index: 10000;
-            }
-        }
-    }
+/* Make sure body content doesn't sit under sticky header */
+.header-spacer {
+  height: 72px;
+}
+
+/* main-body should keep the app content centered */
+main.body {
+  flex: 1;
+  background: linear-gradient(180deg, rgba(246,247,251,0.6), rgba(255,255,255,0.6));
+  padding: 24px 0;
 }

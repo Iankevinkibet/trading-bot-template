@@ -1,223 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>KEVDOLLARAI DC ANALYSIS TOOL</title>
-<link rel="icon" href="logo.png">
-<style>
-:root{--bg-1:#eceef1;--bg-2:#d7dae0;--bg-3:#c3c7cf;--card:#f3f4f6;--ring-idle:#c9cdd4;--ring-track:#dfe2e7;--text-main:#16181c;--text-dim:#6b7078;--green-1:#12c98f;--green-2:#0a9e6f;--red-1:#ff5b5b;--red-2:#d92d2d;--blue:#2f7dff;--orange:#f59a23;--radius:18px}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;min-height:100vh;background:linear-gradient(160deg,var(--bg-1) 0%,var(--bg-2) 55%,var(--bg-3) 100%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text-main);-webkit-tap-highlight-color:transparent}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px;position:sticky;top:0;z-index:10;background:linear-gradient(160deg,var(--bg-1) 0%,var(--bg-2) 100%);border-bottom:1px solid rgba(0,0,0,.06)}
-.brand{display:flex;align-items:center;gap:11px;min-width:0}
-.logo{width:46px;height:46px;flex:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))}
-.brand-name{display:block;font-size:20px;font-weight:900;letter-spacing:.03em;line-height:1;color:var(--text-main)}
-.brand-name em{font-style:normal;color:var(--red-2)}
-.brand-sub{display:block;font-size:10.5px;font-weight:700;letter-spacing:.2em;color:var(--text-dim);margin-top:6px;white-space:nowrap}
-.status-pill{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.05);color:var(--text-dim);white-space:nowrap}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#f5a623;box-shadow:0 0 6px rgba(245,166,35,.7)}
-.status-dot.live{background:var(--green-2);box-shadow:0 0 6px rgba(10,158,111,.7)}
-.status-dot.down{background:var(--red-2);box-shadow:0 0 6px rgba(217,45,45,.7)}
-.wrap{max-width:480px;margin:0 auto;padding:14px 14px 40px;display:flex;flex-direction:column;gap:14px}
-.card{background:linear-gradient(160deg,#f7f8f9,#e9ebee);border-radius:var(--radius);padding:16px;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 24px rgba(30,32,38,.08);border:1px solid rgba(0,0,0,.04)}
-.controls{display:flex;flex-direction:column;gap:16px}
-.control label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);margin-bottom:8px}
-.window-readout{color:var(--text-main);background:rgba(0,0,0,.06);padding:2px 8px;border-radius:999px;font-size:12px}
-select#market{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:#fff;color:var(--text-main);font-size:15px;font-weight:600;appearance:none;-webkit-appearance:none}
-input#sampleSize{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--green-2),var(--red-2));outline:none}
-input#sampleSize::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--text-main);box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer}
-input#sampleSize::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--text-main);box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer}
-.range-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-top:4px}
-.grid-card{position:relative}
-.grid-header{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.03em;margin-bottom:12px;text-transform:uppercase}
-.digit-grid{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:10px 6px;padding-bottom:18px}
-.digit-cell{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
-.digit-ring{position:relative;width:clamp(48px,15vw,64px);height:clamp(48px,15vw,64px)}
-.digit-ring svg{transform:rotate(-90deg);width:100%;height:100%}
-.ring-track{fill:var(--card);stroke:var(--ring-track);stroke-width:6}
-.ring-progress{fill:none;stroke:var(--ring-idle);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .35s ease,stroke .35s ease}
-.digit-cell.max .ring-progress{stroke:url(#greenGrad)}
-.digit-cell.hi2 .ring-progress{stroke:var(--blue)}
-.digit-cell.lo2 .ring-progress{stroke:var(--orange)}
-.digit-cell.min .ring-progress{stroke:url(#redGrad)}
-.digit-label{position:absolute;top:9px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--text-dim)}
-.digit-pct{position:absolute;top:57%;left:50%;transform:translate(-50%,-50%);font-size:clamp(11px,3.4vw,13px);font-weight:800;color:var(--text-main)}
-.digit-marker{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;opacity:0;transition:opacity .2s ease}
-.digit-cell.max .digit-marker{opacity:1;border-bottom:7px solid var(--green-2)}
-.digit-cell.hi2 .digit-marker{opacity:1;border-bottom:7px solid var(--blue)}
-.digit-cell.lo2 .digit-marker{opacity:1;border-top:7px solid var(--orange)}
-.digit-cell.min .digit-marker{opacity:1;border-top:7px solid var(--red-2)}
-.cursor-pointer{position:absolute;width:16px;height:14px;pointer-events:none;top:0;left:0;opacity:0;transition:transform .3s cubic-bezier(.3,1.5,.4,1),opacity .2s ease;z-index:5;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
-.cursor-pointer::after{content:"";position:absolute;bottom:0;left:0;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid var(--text-main)}
-.cursor-pointer.active{opacity:1}
-.cursor-pointer.pulse::after{animation:pointerPulse .32s ease}
-@keyframes pointerPulse{0%{transform:scale(.75)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--text-dim);font-weight:600}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
-@media (max-width:360px){.digit-grid{gap:8px 4px}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>D-Circles (placeholder)</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:var(--bg, #f3f4f6); color:var(--fg,#16181c); margin:0; }
+    .tool-root { padding:20px; }
+    .hero { background:#fff; border-radius:8px; padding:18px; box-shadow:0 6px 18px rgba(16,24,40,0.06); }
+    .circle { width:64px; height:64px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin:8px; font-weight:700; color:#fff; }
+    .odd { background:var(--odd,#d92d2d); }
+    .even { background:var(--even,#2f7dff); }
+  </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#12c98f"/><stop offset="1" stop-color="#0a9e6f"/></linearGradient>
-  <linearGradient id="redGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5b5b"/><stop offset="1" stop-color="#d92d2d"/></linearGradient>
-</defs></svg>
-
-<div class="topbar">
-  <div class="brand"><img class="logo" src="logo.png" alt="KevDollarAI logo" width="46" height="46"><div><span class="brand-name">KEVDOLLAR<em>AI</em></span><span class="brand-sub">DC ANALYSIS TOOL</span></div></div>
-  <div class="status-pill"><span class="status-dot" id="dot"></span><span id="status">CONNECTING…</span></div>
-</div>
-
-<div class="wrap">
-  <div class="card controls">
-    <div class="control">
-      <label for="market">Volatility index</label>
-      <select id="market"></select>
-    </div>
-    <div class="control">
-      <label for="sampleSize">Tick window <span class="window-readout" id="winOut">1000</span></label>
-      <input id="sampleSize" type="range" min="20" max="1000" step="10" value="1000">
-      <div class="range-scale"><span>20</span><span>1000</span></div>
+  <div class="tool-root">
+    <div class="hero">
+      <h2>D-Circles (Placeholder)</h2>
+      <p>This is a licensed placeholder page for the D-Circles analysis tool. It demonstrates the socket-bridge and styling injection.
+      </p>
+      <div id="circles" aria-live="polite">
+        <div class="circle odd">ODD</div>
+        <div class="circle even">EVEN</div>
+        <div class="circle odd">ODD</div>
+      </div>
     </div>
   </div>
+  <script>
+    // Demo: listen for messages from parent to show ticks
+    window.addEventListener('message', function(e) {
+      try{
+        var data = e.data;
+        if(!data || !data.type) return;
+        console.log('tool received', data);
+      }catch(err){}
+    });
 
-  <div class="card grid-card">
-    <div class="grid-header"><span id="count">0 ticks sampled</span><span id="price">Last price –</span></div>
-    <div class="digit-grid" id="grid"><div class="cursor-pointer" id="cursor"></div></div>
-  </div>
-
-  <div class="legend">
-    <span><i style="background:var(--green-2)"></i>Highest</span>
-    <span><i style="background:var(--blue)"></i>2nd highest</span>
-    <span><i style="background:var(--orange)"></i>2nd lowest</span>
-    <span><i style="background:var(--red-2)"></i>Lowest</span>
-  </div>
-</div>
-
-<script>
-const URL_WS = "wss://api.derivws.com/trading/v1/options/ws/public";
-const SYMBOLS = [
-  ["R_10","Volatility 10 Index"],["R_25","Volatility 25 Index"],["R_50","Volatility 50 Index"],
-  ["R_75","Volatility 75 Index"],["R_100","Volatility 100 Index"],
-  ["1HZ10V","Volatility 10 (1s) Index"],["1HZ15V","Volatility 15 (1s) Index"],
-  ["1HZ25V","Volatility 25 (1s) Index"],["1HZ30V","Volatility 30 (1s) Index"],
-  ["1HZ50V","Volatility 50 (1s) Index"],["1HZ75V","Volatility 75 (1s) Index"],
-  ["1HZ90V","Volatility 90 (1s) Index"],["1HZ100V","Volatility 100 (1s) Index"],
-  ["1HZ150V","Volatility 150 (1s) Index"],["1HZ250V","Volatility 250 (1s) Index"]
-];
-const C = 2 * Math.PI * 26;
-const $ = id => document.getElementById(id);
-let ws, buf = [], pip = 2, sym = "R_75", win = 1000, gen = 0, retry = 0, pingT, lastQuote = null, debounce;
-
-try { sym = localStorage.getItem("kev_sym") || sym; win = +localStorage.getItem("kev_win") || win; } catch (e) {}
-if (!SYMBOLS.some(s => s[0] === sym)) sym = "R_75";
-win = Math.max(20, Math.min(1000, win));
-
-$("market").innerHTML = SYMBOLS.map(s => `<option value="${s[0]}">${s[1]}</option>`).join("");
-$("market").value = sym;
-$("sampleSize").value = win; $("winOut").textContent = win;
-
-const grid = $("grid"), cursor = $("cursor");
-for (let d = 0; d < 10; d++) {
-  grid.insertAdjacentHTML("beforeend",
-    `<div class="digit-cell" id="c${d}"><div class="digit-ring"><svg viewBox="0 0 64 64"><circle class="ring-track" cx="32" cy="32" r="26"/><circle class="ring-progress" cx="32" cy="32" r="26" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg><span class="digit-label">${d}</span><span class="digit-pct">0.0%</span></div><div class="digit-marker"></div></div>`);
-}
-
-function setStatus(t, state) {
-  $("status").textContent = t;
-  $("dot").className = "status-dot" + (state ? " " + state : "");
-}
-
-// green = highest, blue = 2nd highest, orange = 2nd lowest, red = lowest. Ties share a color.
-function classify(c) {
-  const out = Array(10).fill("");
-  const vals = [...new Set(c)].sort((a, b) => b - a);
-  if (vals.length < 2) return out;
-  const hi = vals[0], lo = vals[vals.length - 1];
-  const hi2 = vals.length > 2 ? vals[1] : null;
-  const lo2 = vals.length > 3 ? vals[vals.length - 2] : null;
-  c.forEach((v, i) => { out[i] = v === hi ? "max" : v === lo ? "min" : v === hi2 ? "hi2" : v === lo2 ? "lo2" : ""; });
-  return out;
-}
-
-function render(tick) {
-  const n = buf.length, c = Array(10).fill(0);
-  for (const d of buf) c[d]++;
-  const cls = classify(c), max = Math.max(...c, 1);
-  for (let d = 0; d < 10; d++) {
-    const el = $("c" + d);
-    el.className = "digit-cell " + cls[d];
-    el.querySelector(".ring-progress").style.strokeDashoffset = C * (1 - c[d] / max);
-    el.querySelector(".digit-pct").textContent = (n ? c[d] / n * 100 : 0).toFixed(1) + "%";
-  }
-  $("count").textContent = n + " ticks sampled";
-  $("price").textContent = "Last price " + (lastQuote ?? "–");
-  if (n) {
-    const cell = $("c" + buf[n - 1]);
-    cursor.style.transform = `translate(${cell.offsetLeft + cell.offsetWidth / 2 - 8}px,${cell.offsetTop + cell.offsetHeight + 2}px)`;
-    cursor.classList.add("active");
-    if (tick) { cursor.classList.remove("pulse"); void cursor.offsetWidth; cursor.classList.add("pulse"); }
-  } else cursor.classList.remove("active");
-}
-
-const digitOf = p => +Number(p).toFixed(pip).slice(-1);
-function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
-
-function start() {
-  gen++; buf = []; lastQuote = null; render();
-  setStatus("LOADING…");
-  send({ forget_all: "ticks" });
-  send({ ticks_history: sym, count: win, end: "latest", style: "ticks", req_id: gen });
-}
-
-function connect() {
-  setStatus("CONNECTING…");
-  const mine = ws = new WebSocket(URL_WS);
-  mine.onopen = () => { retry = 0; start(); clearInterval(pingT); pingT = setInterval(() => send({ ping: 1 }), 30000); };
-  mine.onmessage = e => { if (mine === ws) handle(JSON.parse(e.data)); };
-  mine.onerror = () => mine.close();
-  mine.onclose = () => {
-    if (mine !== ws) return;
-    clearInterval(pingT);
-    setStatus("RECONNECTING…", "down");
-    setTimeout(connect, Math.min(1000 * 2 ** retry++, 10000));
-  };
-}
-
-function handle(m) {
-  if (m.error) { setStatus((m.error.message || "ERROR").toUpperCase().slice(0, 28), "down"); return; }
-  if (m.msg_type === "history" && m.req_id === gen) {
-    pip = m.pip_size ?? 2;
-    const prices = (m.history && m.history.prices) || [];
-    buf = prices.map(digitOf).slice(-win);
-    lastQuote = prices.length ? Number(prices[prices.length - 1]).toFixed(pip) : null;
-    render();
-    send({ ticks: sym, subscribe: 1, req_id: gen });
-    setStatus("LIVE", "live");
-  } else if (m.msg_type === "tick" && m.tick && m.tick.symbol === sym) {
-    pip = m.tick.pip_size ?? pip;
-    buf.push(digitOf(m.tick.quote));
-    if (buf.length > win) buf.splice(0, buf.length - win);
-    lastQuote = Number(m.tick.quote).toFixed(pip);
-    render(true);
-  }
-}
-
-$("market").onchange = e => {
-  sym = e.target.value;
-  try { localStorage.setItem("kev_sym", sym); } catch (e) {}
-  start();
-};
-$("sampleSize").oninput = e => {
-  win = +e.target.value; $("winOut").textContent = win;
-  try { localStorage.setItem("kev_win", win); } catch (e) {}
-  clearTimeout(debounce); debounce = setTimeout(start, 400);
-};
-window.addEventListener("resize", () => render());
-
-render();
-connect();
-</script>
+    // Attach a basic WebSocket shim if needed
+    (function(){
+      if(window.WebSocket) return;
+      function FakeSocket(){ this.send=function(){}};
+      window.WebSocket = FakeSocket;
+    })();
+  </script>
 </body>
 </html>
