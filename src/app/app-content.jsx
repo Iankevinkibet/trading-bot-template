@@ -27,6 +27,7 @@ import '../components/bot-notification/bot-notification.scss';
 const AppContent = observer(() => {
     const [is_api_initialized, setIsApiInitialized] = React.useState(false);
     const [is_loading, setIsLoading] = React.useState(true);
+    const [loading_error, setLoadingError] = React.useState(null);
 
     const store = useStore();
     const { app, transactions, common, client } = store;
@@ -35,6 +36,9 @@ const AppContent = observer(() => {
     const { recovered_transactions, recoverPendingContracts } = transactions;
     const is_subscribed_to_msg_listener = React.useRef(false);
     const msg_listener = React.useRef(null);
+    const active_symbols_interval = React.useRef(null);
+    const active_symbols_timeout = React.useRef(null);
+    const active_symbols_attempt = React.useRef(0);
     const { connectionStatus } = useApiBase();
 
     // Initialize dev mode keyboard shortcuts
@@ -60,11 +64,23 @@ const AppContent = observer(() => {
     useEffect(() => {
         if (connectionStatus === CONNECTION_STATUS.OPENED) {
             setIsApiInitialized(true);
+            setLoadingError(null);
             common.setSocketOpened(true);
         } else if (connectionStatus !== CONNECTION_STATUS.OPENED) {
             common.setSocketOpened(false);
         }
     }, [common, connectionStatus]);
+
+    React.useEffect(() => {
+        if (is_api_initialized) return undefined;
+
+        const timeoutId = setTimeout(() => {
+            console.error('Trading API connection did not initialize within 20 seconds');
+            setLoadingError(localize('Unable to connect to the trading service. Check your connection and try again.'));
+        }, 20000);
+
+        return () => clearTimeout(timeoutId);
+    }, [is_api_initialized]);
 
     const { current_language } = common;
     const html = document.documentElement;
@@ -119,28 +135,91 @@ const AppContent = observer(() => {
 
     const changeActiveSymbolLoadingState = () => {
         init();
+        setIsLoading(true);
+        setLoadingError(null);
 
-        const retrieveActiveSymbols = () => {
-            const { active_symbols } = ApiHelpers.instance;
+        const attempt = ++active_symbols_attempt.current;
+        if (active_symbols_interval.current) {
+            clearInterval(active_symbols_interval.current);
+            active_symbols_interval.current = null;
+        }
+        if (active_symbols_timeout.current) {
+            clearTimeout(active_symbols_timeout.current);
+            active_symbols_timeout.current = null;
+        }
 
-            active_symbols.retrieveActiveSymbols(true).then(() => {
-                setIsLoading(false);
-            });
+        const failInitialization = error => {
+            if (attempt !== active_symbols_attempt.current) return;
+            console.error('Trading market initialization failed:', error);
+            setLoadingError(localize('Unable to load trading markets. Check your connection and try again.'));
         };
 
-        if (ApiHelpers?.instance?.active_symbols) {
-            retrieveActiveSymbols();
-        } else {
-            // This is a workaround to fix the issue where the active symbols are not loaded immediately
-            // when the API is initialized. Should be replaced with RxJS pubsub
-            const intervalId = setInterval(() => {
-                if (ApiHelpers?.instance?.active_symbols) {
-                    clearInterval(intervalId);
-                    retrieveActiveSymbols();
+        const retrieveActiveSymbols = async active_symbols => {
+            if (active_symbols_interval.current) {
+                clearInterval(active_symbols_interval.current);
+                active_symbols_interval.current = null;
+            }
+
+            let timeoutId;
+            try {
+                await Promise.race([
+                    active_symbols.retrieveActiveSymbols(true),
+                    new Promise((_, reject) => {
+                        timeoutId = setTimeout(
+                            () => reject(new Error('Trading market initialization timed out')),
+                            20000
+                        );
+                        active_symbols_timeout.current = timeoutId;
+                    }),
+                ]);
+
+                if (attempt !== active_symbols_attempt.current) return;
+                if (active_symbols.has_initialization_error) {
+                    throw new Error('Trading market initialization returned an error');
                 }
-            }, 1000);
+                setLoadingError(null);
+                setIsLoading(false);
+            } catch (error) {
+                failInitialization(error);
+            } finally {
+                clearTimeout(timeoutId);
+                if (active_symbols_timeout.current === timeoutId) {
+                    active_symbols_timeout.current = null;
+                }
+            }
+        };
+
+        const active_symbols = ApiHelpers?.instance?.active_symbols;
+        if (active_symbols) {
+            void retrieveActiveSymbols(active_symbols);
+            return;
         }
+
+        let checks = 0;
+        active_symbols_interval.current = setInterval(() => {
+            if (attempt !== active_symbols_attempt.current) return;
+
+            const available_symbols = ApiHelpers?.instance?.active_symbols;
+            if (available_symbols) {
+                void retrieveActiveSymbols(available_symbols);
+            } else if (++checks >= 15) {
+                if (active_symbols_interval.current) {
+                    clearInterval(active_symbols_interval.current);
+                    active_symbols_interval.current = null;
+                }
+                failInitialization(new Error('Trading market service was not initialized'));
+            }
+        }, 1000);
     };
+
+    React.useEffect(
+        () => () => {
+            active_symbols_attempt.current += 1;
+            if (active_symbols_interval.current) clearInterval(active_symbols_interval.current);
+            if (active_symbols_timeout.current) clearTimeout(active_symbols_timeout.current);
+        },
+        []
+    );
 
     React.useEffect(() => {
         if (is_api_initialized) {
@@ -163,7 +242,11 @@ const AppContent = observer(() => {
     if (common?.error) return null;
 
     return is_loading ? (
-        <ChunkLoader message={localize('Initializing Deriv Bot account...')} />
+        <ChunkLoader
+            message={localize('Initializing Deriv Bot account...')}
+            error={loading_error}
+            onRetry={loading_error ? () => window.location.reload() : undefined}
+        />
     ) : (
         <AuthLoadingWrapper>
             <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>

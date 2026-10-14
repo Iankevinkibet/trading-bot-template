@@ -157,6 +157,8 @@ Any static host will work — the build output in `dist/` is a plain SPA.
 3. Set `platform.hostname.production.com` in `brand.config.json` to your deployed hostname (no protocol, no trailing slash) so `isProduction()` detects the right environment and connects to the production WebSocket. The hostname you put here must match the redirect URI you register with Deriv.
 4. Make sure your host serves `index.html` for unknown routes (SPA fallback) — OAuth redirects back to `/?code=...&state=...` and the `App` component handles the callback inline.
 
+For Netlify, `public/_redirects` is included to provide the SPA fallback. Register the site root (for example, `https://your-site.netlify.app/`) as the Deriv OAuth redirect URI; this app sends the OAuth callback to the root, not `/callback`.
+
 ### Example: deploying to Vercel
 
 This is one concrete path that works — any static host (Netlify, Cloudflare Pages, S3+CloudFront, your own infra) will do, but the shape of the steps is the same. Adapt as needed for your host.
