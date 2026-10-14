@@ -22,7 +22,8 @@ export type TRowRenderer = (params: Partial<TMobileRowRenderer>) => React.ReactN
 
 type TDataListRow = {
     action_desc?: {
-        component: React.ReactNode;
+        component?: React.ReactNode;
+        message?: string;
     };
     destination_link?: string;
     row_gap?: number;

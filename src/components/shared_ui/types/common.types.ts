@@ -20,7 +20,7 @@ export type TItem = {
 export type TTableRowItem =
     | {
           message?: string;
-          component?: React.ReactElement;
+          component?: React.ReactNode;
       }
     | string;
 

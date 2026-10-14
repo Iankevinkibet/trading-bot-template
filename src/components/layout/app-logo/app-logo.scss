@@ -2,9 +2,14 @@
     &__logo {
         padding-inline-start: 3.2rem;
         padding-inline-end: 2rem;
-        height: 32px;
+        height: 40px;
         display: flex;
         align-items: center;
+
+        img {
+            display: block;
+            flex: 0 0 auto;
+        }
 
         &-text {
             margin-left: 8px;

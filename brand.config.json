@@ -1,5 +1,5 @@
 {
-    "brand_name": "YourBrand",
+    "brand_name": "KevDollarAI",
     "brand_domain": "yourbrand.com",
     "brand_hostname": {
         "staging": "staging.yourbrand.com/dashboard",
@@ -7,34 +7,34 @@
     },
     "domain_name": "YourBrand.com",
     "colors": {
-        "primary": "#3b82f6",
-        "secondary": "#64748b",
-        "tertiary": "#8b5cf6",
-        "success": "#10b981",
-        "danger": "#ef4444",
-        "warning": "#f59e0b",
-        "info": "#0ea5e9",
-        "neutral": "#6b7280",
-        "black": "#0f172a",
+        "primary": "#d92d2d",
+        "secondary": "#6b7078",
+        "tertiary": "#2f7dff",
+        "success": "#0a9e6f",
+        "danger": "#d92d2d",
+        "warning": "#f59a23",
+        "info": "#2f7dff",
+        "neutral": "#6b7078",
+        "black": "#16181c",
         "white": "#ffffff",
         "grey": {
-            "50": "#f8fafc",
-            "100": "#f1f5f9",
-            "200": "#e2e8f0",
-            "300": "#cbd5e1",
-            "400": "#94a3b8",
-            "500": "#64748b",
-            "600": "#475569",
-            "700": "#334155",
-            "800": "#1e293b",
-            "900": "#0f172a"
+            "50": "#f3f4f6",
+            "100": "#eceef1",
+            "200": "#dfe2e7",
+            "300": "#c9cdd4",
+            "400": "#aeb3bc",
+            "500": "#6b7078",
+            "600": "#595e66",
+            "700": "#444951",
+            "800": "#2d3138",
+            "900": "#16181c"
         }
     },
     "typography": {
         "font_family": {
-            "primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+            "primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
             "secondary": "Georgia, 'Times New Roman', Times, serif",
-            "monospace": "'Courier New', Courier, monospace"
+            "monospace": "'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
         },
         "font_sizes": {
             "xs": "0.75rem",
@@ -58,14 +58,14 @@
         "css_variable_prefix": "--brand"
     },
     "platform": {
-        "name": "Trading Bot",
+        "name": "KevDollarAI",
         "logo": {
             "type": "component",
             "component_name": "BrandLogo",
-            "alt_text": "Trading Bot",
+            "alt_text": "KevDollarAI",
             "link_url": "/",
             "show_text": false,
-            "text": "Trading Bot"
+            "text": "KevDollarAI"
         },
         "footer": {
             "enable_language_settings": false,
